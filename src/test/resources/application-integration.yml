@@ -1,0 +1,63 @@
+spring:
+
+  # Data Source properties
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/${spring.application.name}}
+    username: postgres
+    password: ${DB_PASSWORD:password}
+    hikari:
+      maximum-pool-size: ${DATASOURCE_POOL_MAX_SIZE:10}
+      minimum-idle: ${DATASOURCE_POOL_MIN_IDLE:1}
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+  zipkin:
+    enabled: false
+  sleuth:
+    kafka:
+      enabled: false
+  flyway:
+    enabled: false
+
+eureka:
+  client:
+    enabled: false
+feign:
+  httpclient:
+    enabled: false
+
+# Custom Kafka
+kafka:
+  kafka-properties:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  topics:
+    new-policy-producer:
+      path: "insurance_to_master_car_insurance"
+      enabled: true
+    new-policy-listener:
+      path: "master_to_insurance_car_insurance"
+      enabled: true
+    insurance-service-producer:
+      path: "insurance_to_master_create_application_DMS"
+      enabled: true
+    insurance-service-listener:
+      path: "master_to_insurance_dms_insurance"
+      enabled: true
+    real-estate-producer:
+      path: "insurance_to_master_property_insurance"
+      enabled: true
+    real-estate-listener:
+      path: "master_to_insurance_property_insurance"
+      enabled: true
+    insurance-travel-producer:
+      path: "insurance_to_master_create_application_travel_program"
+      enabled: true
+  bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+
+
+  # Scheduler
+interval-in-cron: 0 0 0 3 * *

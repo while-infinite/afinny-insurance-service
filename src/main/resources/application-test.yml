@@ -1,0 +1,62 @@
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  h2:
+    console:
+      enabled: false
+      settings:
+        web-allow-others: true
+  flyway:
+    enabled: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: off
+
+# Custom Kafka
+kafka:
+  kafka-properties:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  topics:
+    new-policy-producer:
+      path: "insurance_to_master_car_insurance"
+      enabled: true
+    new-policy-listener:
+      path: "master_to_insurance_car_insurance"
+      enabled: true
+    insurance-service-producer:
+      path: "insurance_to_master_create_application_DMS"
+      enabled: true
+    insurance-service-listener:
+      path: "master_to_insurance_dms_insurance"
+      enabled: true
+    real-estate-producer:
+      path: "insurance_to_master_property_insurance"
+      enabled: true
+    real-estate-listener:
+      path: "master_to_insurance_property_insurance"
+      enabled: true
+    insurance-travel-producer:
+      path: "insurance_to_master_create_application_travel_program"
+      enabled: true
+  bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+
+# Scheduler
+interval-in-cron: 0 0 0 3 * *

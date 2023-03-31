@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: ${APPLICATION_NAME:insurance-service}
+
+  # Data Source properties
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://172.17.1.4:5432/afinny?currentSchema=${spring.application.name}}
+    platform: postgres
+    username: ${DB_LOGIN:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: ${DATASOURCE_POOL_MAX_SIZE:10}
+      minimum-idle: ${DATASOURCE_POOL_MIN_IDLE:1}
+
+  # MongoDB properties
+  data:
+    mongodb:
+      host: 172.17.1.4
+      port: 27020
+      database: afinny
+
+  # Maximum allowed file size
+  servlet:
+    multipart:
+      max-file-size: 16MB
+
+  zipkin:
+    baseUrl: ${TRACING_BASEURL:http://localhost:9411/}
+    sender:
+      type: ${TRACING_SENDER_TYPE:kafka}
+    kafka:
+      topic: ${TRACING_KAFKA_TOPIC:tracing_topic}
+    service:
+      name: ${TRACING_SERVICE_NAME:dev-insurance-service}
+  sleuth:
+    sampler:
+      probability: 1
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:172.17.1.4:9092}
+
+  # Messaging
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:172.17.1.4:9092}
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure.include: beans, env, health, info, metrics, mappings
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://eureka-service:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+# Custom Kafka
+kafka:
+  kafka-properties:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  topics:
+    new-policy-producer:
+      path: "insurance_to_master_car_insurance"
+      enabled: true
+    new-policy-listener:
+      path: "master_to_insurance_car_insurance"
+      enabled: true
+    insurance-service-producer:
+      path: "insurance_to_master_create_application_DMS"
+      enabled: true
+    insurance-travel-producer:
+      path: "insurance_to_master_create_application_travel_program"
+      enabled: true
+    real-estate-producer:
+      path: "insurance_to_master_property_insurance"
+      enabled: true
+    real-estate-listener:
+      path: "master_to_insurance_property_insurance"
+      enabled: true
+    insurance-service-listener:
+      path: "master_to_insurance_dms_insurance"
+      enabled: true
+  bootstrap-servers: ${KAFKA_BROKERS:172.17.1.4:9092}
+
+# Scheduler
+interval-in-cron: 0 0 0 3 * *

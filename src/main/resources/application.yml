@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ${APPLICATION_NAME:insurance-service}
+  profiles:
+    active: prod
